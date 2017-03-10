@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/wel"
+        android:id="@+id/welImg"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:layout_width="335dp"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text=" Welcome To TIANJIN SUBWAY"
+        android:textColor="#ff191f26"
+        android:ems="10"
+        android:layout_marginTop="44dp"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:id="@+id/welTxt"
+        android:layout_gravity="center"/>
+
+    <com.tuyenmonkey.mkloader.MKLoader
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        app:mk_type="Whirlpool"
+        android:layout_gravity="center"
+        app:mk_color="@android:color/darker_gray"
+        />
+
+    <ImageView
+        android:id="@+id/bottleImg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginTop="20dp"
+        android:baselineAlignBottom="false"
+        android:src="@drawable/bot" />
+
+
+</LinearLayout>

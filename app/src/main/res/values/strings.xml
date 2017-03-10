@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">OnLocation</string>
+    <string name="Tjstation">天津站</string>
+    <string name="_3">3号线</string>
+    <string name="当前站点">当前站点:</string>
+    <string name="当前线路">当前线路:</string>
+    <string name="_3km">3KM</string>
+    <string name="no_result">对不起，没有搜索到相关数据！</string>
+</resources>
