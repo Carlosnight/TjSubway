@@ -6,4 +6,7 @@
     <string name="当前线路">当前线路:</string>
     <string name="_3km">3KM</string>
     <string name="no_result">对不起，没有搜索到相关数据！</string>
+    <string name="near">附近</string>
+    <string name="route">路线</string>
+    <string name="my">我的</string>
 </resources>

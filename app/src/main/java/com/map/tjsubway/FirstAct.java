@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -52,9 +53,9 @@ public class FirstAct extends Activity implements LocationSource,
         mapView.onCreate(savedInstanceState);// 此方法必须重写
         init();
 
-        ImageButton nearbyBtn = (ImageButton) findViewById(R.id.nearby);
-        ImageButton routeBtn = (ImageButton) findViewById(R.id.route);
-        ImageButton myBtn = (ImageButton) findViewById(R.id.my);
+        LinearLayout nearbyBtn = (LinearLayout) findViewById(R.id.nearby);
+//        ImageButton routeBtn = (ImageButton) findViewById(R.id.route);
+//        ImageButton myBtn = (ImageButton) findViewById(R.id.my);
 
         nearbyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
