@@ -42,7 +42,7 @@
             <!-- <action android:name="android.intent.action.MAIN" /> -->
 
 
-            <!-- &lt;!&ndash;<category android:name="android.intent.category.LAUNCHER" />&ndash;&gt; -->
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
         <activity android:name=".WelcomeAct">
@@ -54,10 +54,13 @@
         </activity>
         <activity android:name=".FirstAct" />
 
-        <service android:name="com.amap.api.location.APSService" />
+        <!--<service android:name="com.amap.api.location.APSService" />-->
 
         <activity android:name=".NearbyAct" />
-        <activity android:name=".Loader"></activity>
+        <activity android:name=".Loader" />
+        <activity android:name=".BaseActivity"/>
+        <activity android:name=".WalkNavi"></activity>
+        <activity android:name=".BikeNavi"></activity>
     </application>
 
 </manifest>

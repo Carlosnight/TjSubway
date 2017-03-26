@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.location.Location;
 import android.net.sip.SipAudioCall;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,11 +22,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amap.api.fence.PoiItem;
-import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
+//import com.amap.api.fence.PoiItem;
+//import com.amap.api.location.AMapLocation;
+//import com.amap.api.location.AMapLocationClient;
+//import com.amap.api.location.AMapLocationClientOption;
+//import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
@@ -41,22 +42,26 @@ import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.core.PoiItem;
 import com.amap.api.services.core.SuggestionCity;
 import com.amap.api.services.poisearch.PoiResult;
 import com.amap.api.services.poisearch.PoiSearch;
+import com.imangazaliev.circlemenu.CircleMenu;
+import com.imangazaliev.circlemenu.CircleMenuButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public  class NearbyAct extends Activity implements LocationSource, AMapLocationListener,
+public  class NearbyAct extends Activity implements AMap.OnMyLocationChangeListener,
         AMap.OnMapClickListener, AMap.OnMarkerClickListener,
         AMap.OnInfoWindowClickListener, AMap.InfoWindowAdapter, PoiSearch.OnPoiSearchListener {
 
     private AMap mAMap;
     private MapView mapview;
     private LocationSource.OnLocationChangedListener mListener;
-    private AMapLocationClient mlocationClient;
-    private AMapLocationClientOption mLocationOption;
+//    private AMapLocationClient mlocationClient;
+//    private AMapLocationClientOption mLocationOption;
+    private MyLocationStyle myLocationStyle;
 
     private static final int STROKE_COLOR = Color.argb(180, 3, 145, 255);
     private static final int FILL_COLOR = Color.argb(10, 0, 0, 180);
@@ -70,6 +75,7 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
     private Double latitude;
     private LatLng ll;
     private LatLonPoint lp ;//= new LatLonPoint(39.0983125873, 117.0954142386);// 116.472995,39.993743
+    private LatLonPoint lpLat ;
 
     private Marker locationMarker; // 选择的点
     private Marker detailMarker;
@@ -93,6 +99,11 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
     private Circle mCircle;
     public static final String LOCATION_MARKER_FLAG = "mylocation";
 
+    private RelativeLayout.LayoutParams relaParams;
+
+    private Bundle lpData;
+    private String lp_lat,lp_lon,lpLat_lat,lpLat_lon;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +114,7 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
         mapview = (MapView) findViewById(R.id.nearbyMap);
         mapview.onCreate(savedInstanceState);// 此方法必须重写
         init();
+        mAMap.moveCamera(CameraUpdateFactory.zoomTo(18));
 
         final TextView mileageTxt = (TextView) findViewById(R.id.mileageTxt);
         SeekBar mileageSeekbar = (SeekBar) findViewById(R.id.mileageSeekBar);
@@ -122,15 +134,62 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
             }
         });
 
-//        mileageSeekbar.setOnClickListener(this);
+        CircleMenu circleMenu = (CircleMenu) findViewById(R.id.circleMenu);
+        circleMenu.setOnItemClickListener(new CircleMenu.OnItemClickListener() {
+            @Override
+            public void onItemClick(CircleMenuButton menuButton) {
+                switch (menuButton.getId()) {
+                    case R.id.bike:
+                        lpData = new Bundle();
+                        lp_lat = String.valueOf(lp.getLatitude());
+                        lp_lon = String.valueOf(lp.getLongitude());
+                        lpLat_lat = String.valueOf(lpLat.getLatitude());
+                        lpLat_lon = String.valueOf(lpLat.getLongitude());
+                        lpData.putString("lp_lat",lp_lat);
+                        lpData.putString("lp_lon",lp_lon);
+                        lpData.putString("lpLat_lat",lpLat_lat);
+                        lpData.putString("lpLat_lon",lpLat_lon);
+
+                        Intent bikeIntent = new Intent(NearbyAct.this,BikeNavi.class);
+                        bikeIntent.putExtras(lpData);
+                        startActivity(bikeIntent);
+                        break;
+                    case R.id.bus:
+//                        showMssage("Search");
+                        break;
+                    case R.id.walk:
+                        lpData = new Bundle();
+                        lp_lat = String.valueOf(lp.getLatitude());
+                        lp_lon = String.valueOf(lp.getLongitude());
+                        lpLat_lat = String.valueOf(lpLat.getLatitude());
+                        lpLat_lon = String.valueOf(lpLat.getLongitude());
+                        lpData.putString("lp_lat",lp_lat);
+                        lpData.putString("lp_lon",lp_lon);
+                        lpData.putString("lpLat_lat",lpLat_lat);
+                        lpData.putString("lpLat_lon",lpLat_lon);
+
+                        Intent walkIntent = new Intent(NearbyAct.this,WalkNavi.class);
+                        walkIntent.putExtras(lpData);
+                        startActivity(walkIntent);
+
+                        break;
+                    case R.id.taxi:
+//                        showMssage("Place");
+                        break;
+                    case R.id.edit:
+//                        showMssage("Edit");
+                        break;
+                }
+            }
+        });
 
          cardView1 = (CardView) findViewById(R.id.cardview1);
-        cardView1.getBackground().setAlpha(150);
+//        cardView1.getBackground().setAlpha(150);
 
-        cardView2 = (CardView) findViewById(R.id.cardview2);
-        //doSearchQuery();
-//        cardView2.setOnClickListener(this);
-//        cardView2.getBackground().setAlpha(200);
+        relaParams = (RelativeLayout.LayoutParams) cardView1.getLayoutParams();
+        relaParams.height = 300;
+        cardView1.setLayoutParams(relaParams);
+
     }
 
 
@@ -146,9 +205,7 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
             mAMap.setOnInfoWindowClickListener(this);
             mAMap.setInfoWindowAdapter(this);
 
-//            ll = new LatLng(lp.getLatitude(), lp.getLongitude());
-            //TextView searchButton = (TextView) findViewById(R.id.btn_search);
-            //searchButton.setOnClickListener(this);
+            mAMap.setOnMyLocationChangeListener(this);
 
 //            locationMarker = mAMap.addMarker(new MarkerOptions()
 //                    .anchor(0.5f, 0.5f)
@@ -185,113 +242,59 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
         mPoiName = (TextView) findViewById(R.id.stationTxt2);
         mPoiAddress = (TextView) findViewById(R.id.routeTxt2);
 
-
-        mAMap.setLocationSource(this);// 设置定位监听
+        etupLocationStyle();
         mAMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
         mAMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
-        // 设置定位的类型为定位模式 ，可以由定位、跟随或地图根据面向方向旋转几种
-        mAMap.setMyLocationType(AMap.LOCATION_TYPE_MAP_FOLLOW);
-//        aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);
-        etupLocationStyle();
+        mAMap.setMyLocationStyle(myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE));
+    }
 
+    private void etupLocationStyle(){
+        // 自定义系统定位蓝点
+        myLocationStyle = new MyLocationStyle();
+
+        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
+        myLocationStyle.interval(10000);
+
+        // 自定义定位蓝点图标
+        myLocationStyle.myLocationIcon(BitmapDescriptorFactory.
+                fromResource(R.drawable.navi_map_gps_locked));
+        // 自定义精度范围的圆形边框颜色
+        myLocationStyle.strokeColor(STROKE_COLOR);
+        //自定义精度范围的圆形边框宽度
+        myLocationStyle.strokeWidth(5);
+        // 设置圆形的填充颜色
+        myLocationStyle.radiusFillColor(FILL_COLOR);
+        // 将自定义的 myLocationStyle 对象添加到地图上
+        mAMap.setMyLocationStyle(myLocationStyle);
     }
 
 
-    /**
-     //     * 定位成功后回调函数
-     //     */
-
-//    public void onLocationChanged(AMapLocation amapLocation) {
-//        if (mListener != null && amapLocation != null) {
-//            if (amapLocation != null
-//                    && amapLocation.getErrorCode() == 0) {
-//                ll = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
-//
-//                //new LatLng(lp.getLatitude(), lp.getLongitude())
-////                Double latitude = amapLocation.getLatitude();
-////                Double Longitude = amapLocation.getLongitude();
-////                lp = new LatLonPoint(latitude,Longitude);
-//
-//
-//                if (!mFirstFix) {
-//                    mFirstFix = true;
-//                    addCircle(ll, amapLocation.getAccuracy());//添加定位精度圆
-//                    addMarker(ll);//添加定位图标
-//                    mSensorHelper.setCurrentMarker(mLocMarker);//定位图标旋转
-//                } else {
-//                    mCircle.setCenter(ll);
-//                    mCircle.setRadius(amapLocation.getAccuracy());
-//                    mLocMarker.setPosition(ll);
-//                }
-//               // mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 18));
-//            } else {
-//                String errText = "定位失败," + amapLocation.getErrorCode()+ ": " + amapLocation.getErrorInfo();
-//                Log.e("AmapErr",errText);
-//            }
-//        }
-//    }
-
-//
-    /**
-     //     * 定位成功后回调函数
-     //     */
-    public void onLocationChanged(AMapLocation amapLocation) {
-        if (mListener != null && amapLocation != null) {
-            if (amapLocation != null
-                    && amapLocation.getErrorCode() == 0) {
-                mListener.onLocationChanged(amapLocation);// 显示系统小蓝点
-                //mAMap.moveCamera(CameraUpdateFactory.zoomTo(16));
-                 latitude = amapLocation.getLatitude();
-                 Longitude = amapLocation.getLongitude();
+    public void onMyLocationChange(Location location) {
+        // 定位回调监听
+        if(location != null) {
+            Log.e("amap", "onMyLocationChange 定位成功， lat: " + location.getLatitude() + " lon: " + location.getLongitude());
+            Bundle bundle = location.getExtras();
+                latitude = location.getLatitude();
+                Longitude = location.getLongitude();
                 lp = new LatLonPoint(latitude,Longitude);
                 ll = new LatLng(lp.getLatitude(), lp.getLongitude());
 
+            if(bundle != null) {
+                int errorCode = bundle.getInt(MyLocationStyle.ERROR_CODE);
+                String errorInfo = bundle.getString(MyLocationStyle.ERROR_INFO);
+                // 定位类型，可能为GPS WIFI等，具体可以参考官网的定位SDK介绍
+                int locationType = bundle.getInt(MyLocationStyle.LOCATION_TYPE);
+
+                Log.e("amap", "定位信息， code: " + errorCode + " errorInfo: " + errorInfo + " locationType: " + locationType );
             } else {
-                String errText = "定位失败," + amapLocation.getErrorCode()+ ": " + amapLocation.getErrorInfo();
-                Log.e("AmapErr",errText);
-                Toast toast = Toast.makeText(NearbyAct.this,"定位失败",Toast.LENGTH_LONG);
-                toast.show();
+                Log.e("amap", "定位信息， bundle is null ");
+
             }
-        }
 
-    }
-
-
-    /**
-     * 激活定位
-     */
-    public void activate(LocationSource.OnLocationChangedListener listener) {
-        mListener = listener;
-        if (mlocationClient == null) {
-            mlocationClient = new AMapLocationClient(this);
-            mLocationOption = new AMapLocationClientOption();
-            //设置定位监听
-            mlocationClient.setLocationListener(this);
-            //设置为高精度定位模式
-            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-            //设置定位参数
-            mlocationClient.setLocationOption(mLocationOption);
-            // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
-            // 注意设置合适的定位时间的间隔（最小间隔支持为2000ms），并且在合适时间调用stopLocation()方法来取消定位请求
-            // 在定位结束后，在合适的生命周期调用onDestroy()方法
-            // 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
-            mLocationOption.setInterval(1000);
-            mlocationClient.startLocation();
+        } else {
+            Log.e("amap", "定位失败");
         }
     }
-
-    /**
-     * 停止定位
-     */
-    public void deactivate() {
-        mListener = null;
-        if (mlocationClient != null) {
-            mlocationClient.stopLocation();
-            mlocationClient.onDestroy();
-        }
-        mlocationClient = null;
-    }
-
 
 
     /**
@@ -331,7 +334,7 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
     protected void onPause() {
         super.onPause();
         mapview.onPause();
-        deactivate();
+//        deactivate();
     }
 
     /**
@@ -350,9 +353,9 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
     protected void onDestroy() {
         super.onDestroy();
         mapview.onDestroy();
-        if(null != mlocationClient){
-            mlocationClient.onDestroy();
-        }
+//        if(null != mlocationClient){
+//            mlocationClient.onDestroy();
+//        }
     }
 
 
@@ -443,8 +446,13 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
                         .fromBitmap(BitmapFactory.decodeResource(
                                 getResources(),
                                 R.drawable.poi_marker_pressed)));
-                //PoiItem mCurrentPoi = (PoiItem) marker.getObject();
-                setPoiItemDisplayContent(marker);
+                //设置cardview的高度为正常高度700
+                relaParams = (RelativeLayout.LayoutParams) cardView1.getLayoutParams();
+                relaParams.height = 700;
+                cardView1.setLayoutParams(relaParams);
+
+                PoiItem PoiLat = (PoiItem) marker.getObject();
+                setPoiItemDisplayContent(PoiLat);
             } catch (Exception e) {
                 // TODO: handle exception
             }
@@ -464,6 +472,11 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
                     .fromBitmap(BitmapFactory.decodeResource(
                             getResources(),
                             markers[index])));
+
+            relaParams = (RelativeLayout.LayoutParams) cardView1.getLayoutParams();
+            relaParams.height = 300;
+            cardView1.setLayoutParams(relaParams);
+
         }else {
             mlastMarker.setIcon(BitmapDescriptorFactory.fromBitmap(
                     BitmapFactory.decodeResource(getResources(), R.drawable.marker_other_highlight)));
@@ -473,9 +486,15 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
     }
 
 
-    private void setPoiItemDisplayContent(final Marker mCurrentPoi) {
+    private void setPoiItemDisplayContent(final PoiItem mCurrentPoi) {
         mPoiName.setText(mCurrentPoi.getTitle());
         mPoiAddress.setText(mCurrentPoi.getSnippet());
+        lpLat = mCurrentPoi.getLatLonPoint();
+
+//        String s = lpLat.toString();
+//        String s1 = lp.toString();
+//        Toast toast = Toast.makeText(NearbyAct.this,s,Toast.LENGTH_SHORT);
+//        toast.show();
     }
 
 
@@ -625,6 +644,9 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
             for (int i = 0; i < mPois.size(); i++) {
                 b.include(new LatLng(mPois.get(i).getLatLonPoint().getLatitude(),
                         mPois.get(i).getLatLonPoint().getLongitude()));
+
+                lpLat = new LatLonPoint(mPois.get(i).getLatLonPoint().getLatitude(),
+                        mPois.get(i).getLatLonPoint().getLongitude());
             }
             return b.build();
         }
@@ -689,154 +711,6 @@ public  class NearbyAct extends Activity implements LocationSource, AMapLocation
         }
     }
 
-    private void etupLocationStyle(){
-        // 自定义系统定位蓝点
-        MyLocationStyle myLocationStyle = new MyLocationStyle();
-        // 自定义定位蓝点图标
-        myLocationStyle.myLocationIcon(BitmapDescriptorFactory.
-                fromResource(R.drawable.navi_map_gps_locked));
-        // 自定义精度范围的圆形边框颜色
-        myLocationStyle.strokeColor(STROKE_COLOR);
-        //自定义精度范围的圆形边框宽度
-        myLocationStyle.strokeWidth(5);
-        // 设置圆形的填充颜色
-        myLocationStyle.radiusFillColor(FILL_COLOR);
-        // 将自定义的 myLocationStyle 对象添加到地图上
-        mAMap.setMyLocationStyle(myLocationStyle);
-    }
 
 
-
-
-
-
-
-
-//    private void init() {
-//        if (aMap == null) {
-//            aMap = mapView.getMap();
-//            setUpMap();
-//        }
-//
-//    }
-//
-//    private void setUpMap() {
-//        aMap.setLocationSource(this);// 设置定位监听
-//        aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
-//        aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
-//        // 设置定位的类型为定位模式 ，可以由定位、跟随或地图根据面向方向旋转几种
-//        aMap.setMyLocationType(AMap.LOCATION_TYPE_MAP_FOLLOW);
-//        //aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);
-//        etupLocationStyle();
-//    }
-//
-//    private void etupLocationStyle(){
-//        // 自定义系统定位蓝点
-//        MyLocationStyle myLocationStyle = new MyLocationStyle();
-//        // 自定义定位蓝点图标
-//        myLocationStyle.myLocationIcon(BitmapDescriptorFactory.
-//                fromResource(R.drawable.navi_map_gps_locked));
-//        // 自定义精度范围的圆形边框颜色
-//        myLocationStyle.strokeColor(STROKE_COLOR);
-//        //自定义精度范围的圆形边框宽度
-//        myLocationStyle.strokeWidth(5);
-//        // 设置圆形的填充颜色
-//        myLocationStyle.radiusFillColor(FILL_COLOR);
-//        // 将自定义的 myLocationStyle 对象添加到地图上
-//        aMap.setMyLocationStyle(myLocationStyle);
-//    }
-//
-//    /**
-//     * 方法必须重写
-//     */
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        mapView.onResume();
-//    }
-//
-//    /**
-//     * 方法必须重写
-//     */
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        mapView.onPause();
-//        deactivate();
-//    }
-//
-//    /**
-//     * 方法必须重写
-//     */
-//    @Override
-//    protected void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        mapView.onSaveInstanceState(outState);
-//    }
-//
-//    /**
-//     * 方法必须重写
-//     */
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        mapView.onDestroy();
-//        if(null != mlocationClient){
-//            mlocationClient.onDestroy();
-//        }
-//    }
-//
-//
-//    /**
-//     * 定位成功后回调函数
-//     */
-//    public void onLocationChanged(AMapLocation amapLocation) {
-//        if (mListener != null && amapLocation != null) {
-//            if (amapLocation != null
-//                    && amapLocation.getErrorCode() == 0) {
-//                mListener.onLocationChanged(amapLocation);// 显示系统小蓝点
-//                aMap.moveCamera(CameraUpdateFactory.zoomTo(18));
-//
-//            } else {
-//                String errText = "定位失败," + amapLocation.getErrorCode()+ ": " + amapLocation.getErrorInfo();
-//                Log.e("AmapErr",errText);
-//            }
-//        }
-//
-//    }
-//
-//
-//    /**
-//     * 激活定位
-//     */
-//    public void activate(LocationSource.OnLocationChangedListener listener) {
-//        mListener = listener;
-//        if (mlocationClient == null) {
-//            mlocationClient = new AMapLocationClient(this);
-//            mLocationOption = new AMapLocationClientOption();
-//            //设置定位监听
-//            mlocationClient.setLocationListener(this);
-//            //设置为高精度定位模式
-//            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-//            //设置定位参数
-//            mlocationClient.setLocationOption(mLocationOption);
-//            // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
-//            // 注意设置合适的定位时间的间隔（最小间隔支持为2000ms），并且在合适时间调用stopLocation()方法来取消定位请求
-//            // 在定位结束后，在合适的生命周期调用onDestroy()方法
-//            // 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
-//            mlocationClient.startLocation();
-//        }
-//    }
-//
-//    /**
-//     * 停止定位
-//     */
-//    public void deactivate() {
-//        mListener = null;
-//        if (mlocationClient != null) {
-//            mlocationClient.stopLocation();
-//            mlocationClient.onDestroy();
-//        }
-//        mlocationClient = null;
-//    }
 }

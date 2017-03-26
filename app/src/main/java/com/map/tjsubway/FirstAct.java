@@ -3,36 +3,32 @@ package com.map.tjsubway;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-
-import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.MyLocationStyle;
 
 
-public class FirstAct extends Activity implements LocationSource,
-        AMapLocationListener {
+public class FirstAct extends Activity implements AMap.OnMyLocationChangeListener {
 
     private AMap aMap;
     private MapView mapView;
-    private OnLocationChangedListener mListener;
-    private AMapLocationClient mlocationClient;
-    private AMapLocationClientOption mLocationOption;
+//    private OnLocationChangedListener mListener;
+//    private AMapLocationClient mlocationClient;
+//    private AMapLocationClientOption mLocationOption;
     private TextView mLocationErrText;
+
+    private MyLocationStyle myLocationStyle;
 
     private static final int STROKE_COLOR = Color.argb(180, 3, 145, 255);
     private static final int FILL_COLOR = Color.argb(10, 0, 0, 180);
@@ -74,23 +70,28 @@ public class FirstAct extends Activity implements LocationSource,
             setUpMap();
         }
 
+//        aMap.setOnMyLocationChangeListener(this);
         mLocationErrText = (TextView)findViewById(R.id.location_errInfo_text);
         mLocationErrText.setVisibility(View.GONE);
     }
 
     private void setUpMap() {
-        aMap.setLocationSource(this);// 设置定位监听
+//        myLocationStyle = new MyLocationStyle();
+//
+//        aMap.setMyLocationStyle(myLocationStyle);
+
         aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
+
         aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
-        // 设置定位的类型为定位模式 ，可以由定位、跟随或地图根据面向方向旋转几种
-        aMap.setMyLocationType(AMap.LOCATION_TYPE_MAP_ROTATE);
-        //aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);
+        aMap.moveCamera(CameraUpdateFactory.zoomTo(18));
         etupLocationStyle();
     }
 
     private void etupLocationStyle(){
         // 自定义系统定位蓝点
-        MyLocationStyle myLocationStyle = new MyLocationStyle();
+        myLocationStyle = new MyLocationStyle();
+        myLocationStyle.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE);
+        myLocationStyle.interval(10000);
         // 自定义定位蓝点图标
         myLocationStyle.myLocationIcon(BitmapDescriptorFactory.
                 fromResource(R.drawable.navi_map_gps_locked));
@@ -120,7 +121,6 @@ public class FirstAct extends Activity implements LocationSource,
     protected void onPause() {
         super.onPause();
         mapView.onPause();
-        deactivate();
     }
 
     /**
@@ -139,71 +139,34 @@ public class FirstAct extends Activity implements LocationSource,
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
-        if(null != mlocationClient){
-            mlocationClient.onDestroy();
-        }
     }
 
 
-    /**
-     * 定位成功后回调函数
-     */
-    @Override
-    public void onLocationChanged(AMapLocation amapLocation) {
-        if (mListener != null && amapLocation != null) {
-            if (amapLocation != null
-                    && amapLocation.getErrorCode() == 0) {
-                mLocationErrText.setVisibility(View.GONE);
-                mListener.onLocationChanged(amapLocation);// 显示系统小蓝点
-                aMap.moveCamera(CameraUpdateFactory.zoomTo(18));
+    public void onMyLocationChange(Location location) {
+        // 定位回调监听
+        if(location != null) {
+            Log.e("amap", "onMyLocationChange 定位成功， lat: " + location.getLatitude() + " lon: " + location.getLongitude());
+            Bundle bundle = location.getExtras();
+            if(bundle != null) {
+                int errorCode = bundle.getInt(MyLocationStyle.ERROR_CODE);
+                String errorInfo = bundle.getString(MyLocationStyle.ERROR_INFO);
+                // 定位类型，可能为GPS WIFI等，具体可以参考官网的定位SDK介绍
+                int locationType = bundle.getInt(MyLocationStyle.LOCATION_TYPE);
 
+                Log.e("AmapErr",errorInfo);
+                Toast toast = Toast.makeText(FirstAct.this,errorInfo,Toast.LENGTH_LONG);
+                toast.show();
+
+                Log.e("amap", "定位信息， code: " + errorCode + " errorInfo: " + errorInfo + " locationType: " + locationType );
             } else {
-                String errText = "定位失败," + amapLocation.getErrorCode()+ ": " + amapLocation.getErrorInfo();
-                Log.e("AmapErr",errText);
-                mLocationErrText.setVisibility(View.VISIBLE);
-                mLocationErrText.setText(errText);
+                Log.e("amap", "定位信息， bundle is null ");
+
             }
-        }
 
-    }
-
-
-    /**
-     * 激活定位
-     */
-    @Override
-    public void activate(OnLocationChangedListener listener) {
-        mListener = listener;
-        if (mlocationClient == null) {
-            mlocationClient = new AMapLocationClient(this);
-            mLocationOption = new AMapLocationClientOption();
-            //设置定位监听
-            mlocationClient.setLocationListener(this);
-            //设置为高精度定位模式
-            mLocationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-            //设置定位参数
-            mlocationClient.setLocationOption(mLocationOption);
-            // 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
-            // 注意设置合适的定位时间的间隔（最小间隔支持为2000ms），并且在合适时间调用stopLocation()方法来取消定位请求
-            // 在定位结束后，在合适的生命周期调用onDestroy()方法
-            // 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
-            mlocationClient.startLocation();
+        } else {
+            Log.e("amap", "定位失败");
         }
     }
-
-    /**
-     * 停止定位
-     */
-    @Override
-    public void deactivate() {
-        mListener = null;
-        if (mlocationClient != null) {
-            mlocationClient.stopLocation();
-            mlocationClient.onDestroy();
-        }
-        mlocationClient = null;
-    }
-
 
     }
 
