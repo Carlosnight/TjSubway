@@ -5,7 +5,7 @@
     android:id="@+id/activity_nearby"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.map.tjsubway.NearbyAct">
+    tools:context="com.map.tjsubway.activity.NearbyAct">
 
     <com.amap.api.maps.MapView
         android:layout_width="match_parent"
@@ -32,8 +32,8 @@
             android:id="@+id/bike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:colorNormal="#FF9800"
-            app:colorPressed="#FB8C00"
+            app:colorNormal="#2196F3"
+            app:colorPressed="#1E88E5"
             app:icon="@mipmap/ic_bike_white"
             />
 
@@ -41,24 +41,24 @@
             android:id="@+id/walk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:colorNormal="#4CAF50"
-            app:colorPressed="#43A047"
+            app:colorNormal="#2196F3"
+            app:colorPressed="#1E88E5"
             app:icon="@mipmap/ic_walk"/>
 
         <com.imangazaliev.circlemenu.CircleMenuButton
             android:id="@+id/taxi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:colorNormal="#F44336"
-            app:colorPressed="#E53935"
+            app:colorNormal="#2196F3"
+            app:colorPressed="#1E88E5"
             app:icon="@mipmap/ic_taxi"/>
 
         <com.imangazaliev.circlemenu.CircleMenuButton
             android:id="@+id/bus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:colorNormal="#9C27B0"
-            app:colorPressed="#8E24AA"
+            app:colorNormal="#2196F3"
+            app:colorPressed="#1E88E5"
             app:icon="@mipmap/ic_bus"/>
 
         <com.imangazaliev.circlemenu.CircleMenuButton
@@ -149,7 +149,8 @@
                 android:id="@+id/stationTxt2"
                 android:layout_toRightOf="@+id/stationTxt"
                 android:layout_alignTop="@+id/stationTxt"
-                android:layout_marginLeft="10dp"/>
+                android:layout_marginLeft="10dp"
+                android:hint="请滑动距离"/>
 
             <TextView
                 android:layout_width="wrap_content"

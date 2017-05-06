@@ -5,7 +5,7 @@
     android:id="@+id/activity_first"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.map.tjsubway.FirstAct"
+    tools:context="com.map.tjsubway.activity.FirstAct"
     android:orientation="vertical">
 
         <RelativeLayout

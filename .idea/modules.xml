@@ -6,6 +6,8 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/circleMenu/circleMenu.iml" filepath="$PROJECT_DIR$/circleMenu/circleMenu.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/selectList/selectList.iml" filepath="$PROJECT_DIR$/selectList/selectList.iml" />
+      <module fileurl="file://$PROJECT_DIR$/step/step.iml" filepath="$PROJECT_DIR$/step/step.iml" />
     </modules>
   </component>
 </project>

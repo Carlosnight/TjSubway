@@ -9,4 +9,10 @@
     <string name="near">附近</string>
     <string name="route">路线</string>
     <string name="my">我的</string>
+    <string name="line1">1号线</string>
+    <string name="line2">2号线</string>
+    <string name="line3">3号线</string>
+    <string name="_6">6号线</string>
+    <string name="_9">9号线（津滨轻轨）</string>
+    <string name="dao">到</string>
 </resources>

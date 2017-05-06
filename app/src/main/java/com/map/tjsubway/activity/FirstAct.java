@@ -1,4 +1,4 @@
-package com.map.tjsubway;
+package com.map.tjsubway.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,6 +17,7 @@ import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.map.tjsubway.R;
 
 
 public class FirstAct extends Activity implements AMap.OnMyLocationChangeListener {
@@ -50,7 +51,7 @@ public class FirstAct extends Activity implements AMap.OnMyLocationChangeListene
         init();
 
         LinearLayout nearbyBtn = (LinearLayout) findViewById(R.id.nearby);
-//        ImageButton routeBtn = (ImageButton) findViewById(R.id.route);
+        LinearLayout routeBtn = (LinearLayout) findViewById(R.id.route);
 //        ImageButton myBtn = (ImageButton) findViewById(R.id.my);
 
         nearbyBtn.setOnClickListener(new View.OnClickListener() {
@@ -61,6 +62,13 @@ public class FirstAct extends Activity implements AMap.OnMyLocationChangeListene
             }
         });
 
+        routeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent routeInt = new Intent(FirstAct.this,RouteChooseAct.class);
+                startActivity(routeInt);
+            }
+        });
 
     }
 

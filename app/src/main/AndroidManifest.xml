@@ -36,7 +36,7 @@
             android:name="com.amap.api.v2.apikey"
             android:value="0d3d972fd7eaf8cc4955500086e8b7bb" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.MainActivity">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
@@ -45,22 +45,32 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".WelcomeAct">
+        <activity android:name=".activity.WelcomeAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FirstAct" />
+        <activity android:name=".activity.FirstAct" />
 
-        <!--<service android:name="com.amap.api.location.APSService" />-->
+        <!-- <service android:name="com.amap.api.location.APSService" /> -->
 
-        <activity android:name=".NearbyAct" />
+        <activity android:name=".activity.NearbyAct" />
         <activity android:name=".Loader" />
-        <activity android:name=".BaseActivity"/>
-        <activity android:name=".WalkNavi"></activity>
-        <activity android:name=".BikeNavi"></activity>
+        <activity android:name=".navi.BaseActivity" />
+        <activity android:name=".navi.WalkNavi" />
+        <activity android:name=".navi.BikeNavi" />
+        <activity android:name=".route.WalkRouteActivity" />
+        <activity android:name=".route.WalkRouteDetailActivity" />
+        <activity android:name=".route.BusRouteActivity" />
+        <activity android:name=".route.BusRouteDetailActivity" />
+        <activity android:name=".route.DriveRouteActivity" />
+        <activity android:name=".route.DriveRouteDetailActivity" />
+        <activity android:name=".route.RideRouteActivity" />
+        <activity android:name=".route.RideRouteDetailActivity" />
+        <activity android:name=".route.RouteActivity" />
+        <activity android:name=".activity.RouteChooseAct"></activity>
     </application>
 
 </manifest>

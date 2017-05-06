@@ -12,6 +12,8 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/circleMenu" />
             <option value="$PROJECT_DIR$/library" />
+            <option value="$PROJECT_DIR$/selectList" />
+            <option value="$PROJECT_DIR$/step" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

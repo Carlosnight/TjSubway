@@ -1,26 +1,19 @@
-package com.map.tjsubway;
+package com.map.tjsubway.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
 import android.location.Location;
-import android.net.sip.SipAudioCall;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 //import com.amap.api.fence.PoiItem;
 //import com.amap.api.location.AMapLocation;
@@ -48,6 +41,13 @@ import com.amap.api.services.poisearch.PoiResult;
 import com.amap.api.services.poisearch.PoiSearch;
 import com.imangazaliev.circlemenu.CircleMenu;
 import com.imangazaliev.circlemenu.CircleMenuButton;
+import com.map.tjsubway.R;
+import com.map.tjsubway.helper.SensorEventHelper;
+import com.map.tjsubway.route.BusRouteActivity;
+import com.map.tjsubway.route.DriveRouteActivity;
+import com.map.tjsubway.route.RideRouteActivity;
+import com.map.tjsubway.route.WalkRouteActivity;
+import com.map.tjsubway.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +85,8 @@ public  class NearbyAct extends Activity implements AMap.OnMyLocationChangeListe
     private ArrayList<com.amap.api.services.core.PoiItem> poiItems;// poi数据
 
     private RelativeLayout mPoiDetail;
+    private TextView stationtxt2;
+    private TextView routetxt2;
     private TextView mPoiName, mPoiAddress;
     private String keyWord = "";
     private EditText mSearchText;
@@ -134,12 +136,15 @@ public  class NearbyAct extends Activity implements AMap.OnMyLocationChangeListe
             }
         });
 
+        stationtxt2 = (TextView) findViewById(R.id.stationTxt2);
+        routetxt2 = (TextView) findViewById(R.id.routeTxt2);
         CircleMenu circleMenu = (CircleMenu) findViewById(R.id.circleMenu);
         circleMenu.setOnItemClickListener(new CircleMenu.OnItemClickListener() {
             @Override
             public void onItemClick(CircleMenuButton menuButton) {
                 switch (menuButton.getId()) {
                     case R.id.bike:
+
                         lpData = new Bundle();
                         lp_lat = String.valueOf(lp.getLatitude());
                         lp_lon = String.valueOf(lp.getLongitude());
@@ -150,14 +155,12 @@ public  class NearbyAct extends Activity implements AMap.OnMyLocationChangeListe
                         lpData.putString("lpLat_lat",lpLat_lat);
                         lpData.putString("lpLat_lon",lpLat_lon);
 
-                        Intent bikeIntent = new Intent(NearbyAct.this,BikeNavi.class);
+                        Intent bikeIntent = new Intent(NearbyAct.this,RideRouteActivity.class);
                         bikeIntent.putExtras(lpData);
                         startActivity(bikeIntent);
                         break;
                     case R.id.bus:
-//                        showMssage("Search");
-                        break;
-                    case R.id.walk:
+
                         lpData = new Bundle();
                         lp_lat = String.valueOf(lp.getLatitude());
                         lp_lon = String.valueOf(lp.getLongitude());
@@ -168,13 +171,41 @@ public  class NearbyAct extends Activity implements AMap.OnMyLocationChangeListe
                         lpData.putString("lpLat_lat",lpLat_lat);
                         lpData.putString("lpLat_lon",lpLat_lon);
 
-                        Intent walkIntent = new Intent(NearbyAct.this,WalkNavi.class);
+                        Intent busIntent = new Intent(NearbyAct.this, BusRouteActivity.class);
+                        busIntent.putExtras(lpData);
+                        startActivity(busIntent);
+                        break;
+                    case R.id.walk:
+
+                        lpData = new Bundle();
+                        lp_lat = String.valueOf(lp.getLatitude());
+                        lp_lon = String.valueOf(lp.getLongitude());
+                        lpLat_lat = String.valueOf(lpLat.getLatitude());
+                        lpLat_lon = String.valueOf(lpLat.getLongitude());
+                        lpData.putString("lp_lat",lp_lat);
+                        lpData.putString("lp_lon",lp_lon);
+                        lpData.putString("lpLat_lat",lpLat_lat);
+                        lpData.putString("lpLat_lon",lpLat_lon);
+
+                        Intent walkIntent = new Intent(NearbyAct.this,WalkRouteActivity.class);
                         walkIntent.putExtras(lpData);
                         startActivity(walkIntent);
 
                         break;
                     case R.id.taxi:
-//                        showMssage("Place");
+                        lpData = new Bundle();
+                        lp_lat = String.valueOf(lp.getLatitude());
+                        lp_lon = String.valueOf(lp.getLongitude());
+                        lpLat_lat = String.valueOf(lpLat.getLatitude());
+                        lpLat_lon = String.valueOf(lpLat.getLongitude());
+                        lpData.putString("lp_lat",lp_lat);
+                        lpData.putString("lp_lon",lp_lon);
+                        lpData.putString("lpLat_lat",lpLat_lat);
+                        lpData.putString("lpLat_lon",lpLat_lon);
+
+                        Intent taxiIntent = new Intent(NearbyAct.this,DriveRouteActivity.class);
+                        taxiIntent.putExtras(lpData);
+                        startActivity(taxiIntent);
                         break;
                     case R.id.edit:
 //                        showMssage("Edit");
@@ -185,7 +216,7 @@ public  class NearbyAct extends Activity implements AMap.OnMyLocationChangeListe
 
          cardView1 = (CardView) findViewById(R.id.cardview1);
 //        cardView1.getBackground().setAlpha(150);
-
+        whetherToShowDetailInfo(false);
         relaParams = (RelativeLayout.LayoutParams) cardView1.getLayoutParams();
         relaParams.height = 300;
         cardView1.setLayoutParams(relaParams);
@@ -220,9 +251,8 @@ public  class NearbyAct extends Activity implements AMap.OnMyLocationChangeListe
 //        if (mSensorHelper != null) {
 //            mSensorHelper.registerSensorListener();
 //        }
-
-
         setup();
+
         //mAMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 14));
     }
 
@@ -324,7 +354,7 @@ public  class NearbyAct extends Activity implements AMap.OnMyLocationChangeListe
     protected void onResume() {
         super.onResume();
         mapview.onResume();
-        whetherToShowDetailInfo(false);
+        whetherToShowDetailInfo(true);
     }
 
     /**
@@ -445,8 +475,8 @@ public  class NearbyAct extends Activity implements AMap.OnMyLocationChangeListe
                 detailMarker.setIcon(BitmapDescriptorFactory
                         .fromBitmap(BitmapFactory.decodeResource(
                                 getResources(),
-                                R.drawable.poi_marker_pressed)));
-                //设置cardview的高度为正常高度700
+                                R.mipmap.poi_marker_pressed)));
+//                设置cardview的高度为正常高度700
                 relaParams = (RelativeLayout.LayoutParams) cardView1.getLayoutParams();
                 relaParams.height = 700;
                 cardView1.setLayoutParams(relaParams);
@@ -533,25 +563,28 @@ public  class NearbyAct extends Activity implements AMap.OnMyLocationChangeListe
 //    }
 
     private int[] markers = {
-            R.drawable.poi_marker_1,
-            R.drawable.poi_marker_2,
-            R.drawable.poi_marker_3,
-            R.drawable.poi_marker_4,
-            R.drawable.poi_marker_5,
-            R.drawable.poi_marker_6,
-            R.drawable.poi_marker_7,
-            R.drawable.poi_marker_8,
-            R.drawable.poi_marker_9,
-            R.drawable.poi_marker_10
+            R.mipmap.poi_marker_1,
+            R.mipmap.poi_marker_1,
+            R.mipmap.poi_marker_1,
+            R.mipmap.poi_marker_1,
+            R.mipmap.poi_marker_1,
+            R.mipmap.poi_marker_1,
+            R.mipmap.poi_marker_1,
+            R.mipmap.poi_marker_1,
+            R.mipmap.poi_marker_1,
+            R.mipmap.poi_marker_1
     };
 
     private void whetherToShowDetailInfo(boolean isToShow) {
         if (isToShow) {
             mPoiDetail.setVisibility(View.VISIBLE);
+//            stationtxt2.setVisibility(View.VISIBLE);
+//            routetxt2.setVisibility(View.VISIBLE);
 
         } else {
             mPoiDetail.setVisibility(View.GONE);
-
+//            stationtxt2.setVisibility(View.GONE);
+//            routetxt2.setVisibility(View.GONE);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.map.tjsubway;
+package com.map.tjsubway.helper;
 
 import android.content.Context;
 import android.hardware.Sensor;
